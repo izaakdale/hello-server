@@ -28,3 +28,8 @@ func main() {
 
 	http.ListenAndServe(":"+port, mux)
 }
+package main
+
+func main() {
+
+}

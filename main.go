@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 
@@ -10,14 +11,15 @@ import (
 
 func main() {
 	mux := ittp.NewServeMux()
-	mux.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, world!"))
+
+	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]string{"hello": "world"})
 	})
-	mux.HandleFunc("/hello/{name}", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, " + r.PathValue("name") + "!"))
+	mux.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]string{"hello": r.PathValue("name")})
 	})
 
-	cors.New(cors.Options{
+	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 	})
 
@@ -26,10 +28,5 @@ func main() {
 		port = "80"
 	}
 
-	http.ListenAndServe(":"+port, mux)
-}
-package main
-
-func main() {
-
+	http.ListenAndServe(":"+port, c.Handler(mux))
 }
